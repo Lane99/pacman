@@ -93,9 +93,3 @@ window.addEventListener('keydown', (e) => {
       break;
   }
 });
-
-function isColliding() {
-  wall.some(brick => 
-    if ()
-  )
-}
