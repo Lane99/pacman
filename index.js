@@ -66,6 +66,14 @@ function animate() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   wall.forEach((brick) => {
     brick.draw();
+
+    if (
+      pacman.y - pacman.r <= brick.y + Brick.height &&
+      pacman.x + pacman.r >= brick.x &&
+      pacman.y + pacman.r >= brick.y &&
+      pacman.x - pacman.r <= brick.x + Brick.width
+    )
+      console.log('boom', pacman.y - pacman.r, brick.y + Brick.height);
   });
   pacman.update();
   requestAnimationFrame(animate);
