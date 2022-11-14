@@ -9,7 +9,6 @@ class Brick {
 
   constructor(x, y) {
     this.x = x;
-    as;
     this.y = y;
   }
   draw() {
@@ -94,3 +93,9 @@ window.addEventListener('keydown', (e) => {
       break;
   }
 });
+
+function isColliding() {
+  wall.some(brick => 
+    if ()
+  )
+}
