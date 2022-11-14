@@ -46,7 +46,7 @@ let pacman = new Pacman(1.5 * Brick.width, 1.5 * Brick.height, 0, 0);
 let map = [
   [1, 1, 1, 1, 1, 1, 1, 1],
   [1, 0, 0, 0, 0, 0, 0, 1],
-  [1, 0, 1, 1, 1, 1, 0, 1],
+  [1, 0, 1, 1, 0, 1, 0, 1],
   [1, 0, 0, 1, 0, 1, 0, 1],
   [1, 0, 0, 0, 0, 1, 0, 1],
   [1, 0, 0, 0, 0, 1, 0, 1],
@@ -66,14 +66,25 @@ function animate() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   wall.forEach((brick) => {
     brick.draw();
-
+    // sat theorem or some other crazy shit
+    /*
+    if (!(
+      pacman.y - pacman.r > brick.y + Brick.height ||
+      pacman.x + pacman.r < brick.x ||
+      pacman.y + pacman.r < brick.y ||
+      pacman.x - pacman.r > brick.x + Brick.width
+    ))
+      ako se bar na jednoj osi projekcije (senke) ne preklapaju i onda se dobije ovo njegovo ispod
+    */
     if (
-      pacman.y - pacman.r <= brick.y + Brick.height &&
-      pacman.x + pacman.r >= brick.x &&
-      pacman.y + pacman.r >= brick.y &&
-      pacman.x - pacman.r <= brick.x + Brick.width
-    )
-      console.log('boom', pacman.y - pacman.r, brick.y + Brick.height);
+      pacman.y - pacman.r + pacman.vy <= brick.y + Brick.height &&
+      pacman.x + pacman.r + pacman.vx >= brick.x &&
+      pacman.y + pacman.r + pacman.vy >= brick.y &&
+      pacman.x - pacman.r + pacman.vx <= brick.x + Brick.width
+    ) {
+      pacman.vx = 0;
+      pacman.vy = 0;
+    }
   });
   pacman.update();
   requestAnimationFrame(animate);
