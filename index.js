@@ -93,7 +93,9 @@ function animate() {
 
 animate();
 
+let lastKey = '';
 window.addEventListener('keydown', e => {
+  lastKey = e.key;
   switch (e.key) {
     case 'w':
       pacman.vx = 0;
