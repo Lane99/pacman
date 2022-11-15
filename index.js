@@ -75,6 +75,7 @@ function animate() {
       pacman.x - pacman.r > brick.x + Brick.width
     ))
       ako se bar na jednoj osi projekcije (senke) ne preklapaju i onda se dobije ovo njegovo ispod
+      vidi na MDN collision detection 2D
     */
     if (
       pacman.y - pacman.r + pacman.vy <= brick.y + Brick.height &&
@@ -92,7 +93,7 @@ function animate() {
 
 animate();
 
-window.addEventListener('keydown', (e) => {
+window.addEventListener('keydown', e => {
   switch (e.key) {
     case 'w':
       pacman.vx = 0;
