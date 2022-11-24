@@ -66,16 +66,9 @@ function animate() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   wall.forEach((brick) => {
     brick.draw();
-    // sat theorem or some other crazy shit
     /*
-    if (!(
-      pacman.y - pacman.r > brick.y + Brick.height ||
-      pacman.x + pacman.r < brick.x ||
-      pacman.y + pacman.r < brick.y ||
-      pacman.x - pacman.r > brick.x + Brick.width
-    ))
-      ako se bar na jednoj osi projekcije (senke) ne preklapaju i onda se dobije ovo njegovo ispod
-      vidi na MDN collision detection 2D
+    dva pravougaonika se preklapaju onda i samo onda ako se sve njihove senke preklapaju
+    ovo je SAT teorema primenjena na kvadrate
     */
     if (
       pacman.y - pacman.r + pacman.vy <= brick.y + Brick.height &&
