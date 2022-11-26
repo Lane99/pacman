@@ -66,10 +66,6 @@ function animate() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   wall.forEach((brick) => {
     brick.draw();
-    /*
-    dva pravougaonika se preklapaju onda i samo onda ako se sve njihove senke preklapaju
-    ovo je SAT teorema primenjena na kvadrate
-    */
     if (isGoingToCollide(pacman, brick)) {
       pacman.vx = 0;
       pacman.vy = 0;
@@ -103,6 +99,10 @@ window.addEventListener('keydown', (e) => {
   }
 });
 
+/*
+    dva pravougaonika se preklapaju onda i samo onda ako se sve njihove senke preklapaju
+    ovo je SAT teorema primenjena na kvadrate
+    */
 function isGoingToCollide(pacman, brick) {
   return (
     pacman.y - pacman.r + pacman.vy <= brick.y + Brick.height &&
