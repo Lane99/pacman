@@ -70,12 +70,7 @@ function animate() {
     dva pravougaonika se preklapaju onda i samo onda ako se sve njihove senke preklapaju
     ovo je SAT teorema primenjena na kvadrate
     */
-    if (
-      pacman.y - pacman.r + pacman.vy <= brick.y + Brick.height &&
-      pacman.x + pacman.r + pacman.vx >= brick.x &&
-      pacman.y + pacman.r + pacman.vy >= brick.y &&
-      pacman.x - pacman.r + pacman.vx <= brick.x + Brick.width
-    ) {
+    if (isGoingToCollide(pacman, brick)) {
       pacman.vx = 0;
       pacman.vy = 0;
     }
@@ -87,24 +82,32 @@ function animate() {
 animate();
 
 let lastKey = '';
-window.addEventListener('keydown', e => {
-  lastKey = e.key;
+window.addEventListener('keydown', (e) => {
   switch (e.key) {
     case 'w':
       pacman.vx = 0;
       pacman.vy = -5;
       break;
     case 'a':
-      pacman.vy = 0;
       pacman.vx = -5;
+      pacman.vy = 0;
       break;
     case 's':
       pacman.vx = 0;
       pacman.vy = 5;
       break;
     case 'd':
-      pacman.vy = 0;
       pacman.vx = 5;
+      pacman.vy = 0;
       break;
   }
 });
+
+function isGoingToCollide(pacman, brick) {
+  return (
+    pacman.y - pacman.r + pacman.vy <= brick.y + Brick.height &&
+    pacman.x + pacman.r + pacman.vx >= brick.x &&
+    pacman.y + pacman.r + pacman.vy >= brick.y &&
+    pacman.x - pacman.r + pacman.vx <= brick.x + Brick.width
+  );
+}
