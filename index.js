@@ -3,6 +3,9 @@ canvas.width = innerWidth;
 canvas.height = innerHeight;
 const ctx = canvas.getContext('2d');
 
+let lastKey = '';
+window.addEventListener('keydown', (e) => (lastKey = e.key));
+
 class Brick {
   static width = 40;
   static height = 40;
@@ -23,7 +26,7 @@ class Pacman {
     this.y = y;
     this.vx = vx;
     this.vy = vy;
-    this.r = 15;
+    this.r = 18;
   }
 
   draw() {
@@ -34,8 +37,27 @@ class Pacman {
     ctx.closePath();
   }
 
-  update() {
-    this.draw();
+  updateSpeed() {
+    if (lastKey == 'w') {
+      this.vy = -5;
+      if (!isGoingToCollide(this, wall)) this.vx = 0;
+      else this.vy = 0;
+    } else if (lastKey == 'a') {
+      this.vx = -5;
+      if (!isGoingToCollide(this, wall)) this.vy = 0;
+      else this.vx = 0;
+    } else if (lastKey == 's') {
+      this.vy = 5;
+      if (!isGoingToCollide(this, wall)) this.vx = 0;
+      else this.vy = 0;
+    } else if (lastKey == 'd') {
+      this.vx = 5;
+      if (!isGoingToCollide(this, wall)) this.vy = 0;
+      else this.vx = 0;
+    }
+  }
+
+  updatePosition() {
     this.x += this.vx;
     this.y += this.vy;
   }
@@ -46,9 +68,9 @@ let pacman = new Pacman(1.5 * Brick.width, 1.5 * Brick.height, 0, 0);
 let map = [
   [1, 1, 1, 1, 1, 1, 1, 1],
   [1, 0, 0, 0, 0, 0, 0, 1],
-  [1, 0, 1, 1, 0, 1, 0, 1],
-  [1, 0, 0, 1, 0, 1, 0, 1],
-  [1, 0, 0, 0, 0, 1, 0, 1],
+  [1, 0, 1, 1, 1, 1, 0, 1],
+  [1, 0, 0, 0, 0, 0, 0, 1],
+  [1, 0, 1, 1, 1, 1, 0, 1],
   [1, 0, 0, 0, 0, 1, 0, 1],
   [1, 0, 0, 0, 0, 0, 0, 1],
   [1, 1, 1, 1, 1, 1, 1, 1],
@@ -64,50 +86,25 @@ map.forEach((row, i) => {
 
 function animate() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  wall.forEach((brick) => {
-    brick.draw();
-    if (isGoingToCollide(pacman, brick)) {
-      pacman.vx = 0;
-      pacman.vy = 0;
-    }
-  });
-  pacman.update();
+  wall.forEach((brick) => brick.draw());
+  pacman.draw();
+  pacman.updateSpeed();
+  pacman.updatePosition();
   requestAnimationFrame(animate);
 }
 
 animate();
 
-let lastKey = '';
-window.addEventListener('keydown', (e) => {
-  switch (e.key) {
-    case 'w':
-      pacman.vx = 0;
-      pacman.vy = -5;
-      break;
-    case 'a':
-      pacman.vx = -5;
-      pacman.vy = 0;
-      break;
-    case 's':
-      pacman.vx = 0;
-      pacman.vy = 5;
-      break;
-    case 'd':
-      pacman.vx = 5;
-      pacman.vy = 0;
-      break;
-  }
-});
-
-/*
+function isGoingToCollide(pacman, wall) {
+  /*
     dva pravougaonika se preklapaju onda i samo onda ako se sve njihove senke preklapaju
     ovo je SAT teorema primenjena na kvadrate
-    */
-function isGoingToCollide(pacman, brick) {
-  return (
-    pacman.y - pacman.r + pacman.vy <= brick.y + Brick.height &&
-    pacman.x + pacman.r + pacman.vx >= brick.x &&
-    pacman.y + pacman.r + pacman.vy >= brick.y &&
-    pacman.x - pacman.r + pacman.vx <= brick.x + Brick.width
+  */
+  return wall.some(
+    (brick) =>
+      pacman.y - pacman.r + pacman.vy <= brick.y + Brick.height &&
+      pacman.x + pacman.r + pacman.vx >= brick.x &&
+      pacman.y + pacman.r + pacman.vy >= brick.y &&
+      pacman.x - pacman.r + pacman.vx <= brick.x + Brick.width
   );
 }
