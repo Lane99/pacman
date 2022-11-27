@@ -21,12 +21,12 @@ class Brick {
 }
 
 class Pacman {
-  constructor(x, y, vx, vy) {
+  static v = 5;
+
+  constructor(x, y) {
     this.x = x;
     this.y = y;
-    this.vx = vx;
-    this.vy = vy;
-    this.r = 18;
+    this.r = 15;
   }
 
   draw() {
@@ -37,33 +37,32 @@ class Pacman {
     ctx.closePath();
   }
 
-  updateSpeed() {
-    if (lastKey == 'w') {
-      this.vy = -5;
-      if (!isGoingToCollide(this, wall)) this.vx = 0;
-      else this.vy = 0;
+  move() {
+    if (lastKey == 'd') {
+      this.x += Pacman.v;
+      if (isColliding(pacman, wall)) {
+        this.x -= Pacman.v;
+      }
     } else if (lastKey == 'a') {
-      this.vx = -5;
-      if (!isGoingToCollide(this, wall)) this.vy = 0;
-      else this.vx = 0;
+      this.x -= Pacman.v;
+      if (isColliding(pacman, wall)) {
+        this.x += Pacman.v;
+      }
+    } else if (lastKey == 'w') {
+      this.y -= Pacman.v;
+      if (isColliding(pacman, wall)) {
+        this.y += Pacman.v;
+      }
     } else if (lastKey == 's') {
-      this.vy = 5;
-      if (!isGoingToCollide(this, wall)) this.vx = 0;
-      else this.vy = 0;
-    } else if (lastKey == 'd') {
-      this.vx = 5;
-      if (!isGoingToCollide(this, wall)) this.vy = 0;
-      else this.vx = 0;
+      this.y += Pacman.v;
+      if (isColliding(pacman, wall)) {
+        this.y -= Pacman.v;
+      }
     }
-  }
-
-  updatePosition() {
-    this.x += this.vx;
-    this.y += this.vy;
   }
 }
 
-let pacman = new Pacman(1.5 * Brick.width, 1.5 * Brick.height, 0, 0);
+let pacman = new Pacman(1.5 * Brick.width, 1.5 * Brick.height);
 
 let map = [
   [1, 1, 1, 1, 1, 1, 1, 1],
@@ -88,23 +87,22 @@ function animate() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   wall.forEach((brick) => brick.draw());
   pacman.draw();
-  pacman.updateSpeed();
-  pacman.updatePosition();
+  pacman.move();
   requestAnimationFrame(animate);
 }
 
 animate();
 
-function isGoingToCollide(pacman, wall) {
+function isColliding(pacman, wall) {
   /*
     dva pravougaonika se preklapaju onda i samo onda ako se sve njihove senke preklapaju
     ovo je SAT teorema primenjena na kvadrate
   */
   return wall.some(
     (brick) =>
-      pacman.y - pacman.r + pacman.vy <= brick.y + Brick.height &&
-      pacman.x + pacman.r + pacman.vx >= brick.x &&
-      pacman.y + pacman.r + pacman.vy >= brick.y &&
-      pacman.x - pacman.r + pacman.vx <= brick.x + Brick.width
+      pacman.y - pacman.r <= brick.y + Brick.height &&
+      pacman.x + pacman.r >= brick.x &&
+      pacman.y + pacman.r >= brick.y &&
+      pacman.x - pacman.r <= brick.x + Brick.width
   );
 }
