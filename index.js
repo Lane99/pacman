@@ -6,25 +6,26 @@ const ctx = canvas.getContext('2d');
 let lastKey = '';
 window.addEventListener('keydown', (e) => (lastKey = e.key));
 
-class Brick {
+class Tile {
   static width = 40;
   static height = 40;
 
-  constructor(x, y) {
+  constructor(x, y, type) {
     this.x = x;
     this.y = y;
+    this.type = type;
   }
   draw() {
-    ctx.fillStyle = 'blue';
-    ctx.fillRect(this.x, this.y, Brick.width, Brick.height);
+    if (this.type == 'brick') ctx.fillStyle = 'blue';
+    else if (this.type == 'empty') ctx.fillStyle = 'black';
+    ctx.fillRect(this.x, this.y, Tile.width, Tile.height);
   }
 }
 
 class Pacman {
   static v = 5;
+  static r = 15;
 
-  vx = 0;
-  vy = 0;
   constructor(x, y) {
     this.x = x;
     this.y = y;
@@ -38,21 +39,9 @@ class Pacman {
     ctx.fill();
     ctx.closePath();
   }
-
-  updateSpeed() {
-    if (lastKey == 'w') this.vy = -Pacman.v;
-    else if (lastKey == 'a') this.vx = -Pacman.v;
-    else if (lastKey == 's') this.vy = Pacman.v;
-    else if (lastKey == 'd') this.vx = Pacman.v;
-  }
-
-  updatePosition() {
-    this.x += this.vx;
-    this.y += this.vy;
-  }
 }
 
-let pacman = new Pacman(1.5 * Brick.width, 1.5 * Brick.height);
+let pacman = new Pacman(1.5 * Tile.width, 1.5 * Tile.height);
 
 let map = [
   [1, 1, 1, 1, 1, 1, 1, 1],
@@ -65,54 +54,50 @@ let map = [
   [1, 1, 1, 1, 1, 1, 1, 1],
 ];
 
-let wall = [];
+let world = [];
 
 map.forEach((row, i) => {
   row.forEach((el, j) => {
-    if (el) wall.push(new Brick(j * Brick.width, i * Brick.height));
+    if (el) world.push(new Tile(j * Tile.width, i * Tile.height, 'brick'));
+    else world.push(new Tile(j * Tile.width, i * Tile.height, 'empty'));
   });
 });
 
 function animate() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  wall.forEach((brick) => brick.draw());
+  //ctx.clearRect(0, 0, canvas.width, canvas.height);
+  world.forEach((tile) => tile.draw());
   pacman.draw();
-  pacman.updateSpeed();
-  pacman.updatePosition();
-  if (collisionDirection(pacman, wall) == 'horizontal') {
-    if (lastKey == 'a' || lastKey == 'd') {
-      lastKey = '';
-      pacman.x -= pacman.vx;
-      pacman.vx = 0;
-    }
-  } else if (collisionDirection(pacman, wall) == 'vertical') {
-    if (lastKey == 'w' || lastKey == 's') {
-      lastKey = '';
-      pacman.y -= pacman.vy;
-      pacman.vy = 0;
-    }
-  } else {
-    if 
-  }
+  if (nextTileType(pacman.x, pacman.y, lastKey) == 'empty') {
+    console.log('prazno');
+  } else console.log('puno');
 
-  requestAnimationFrame(animate);
+  //requestAnimationFrame(animate);
   //setInterval(animate, 1000);
 }
 
 animate();
 
-function collisionDirection(pacman, wall) {
+function nextTileType(x, y, direction) {
+  world.forEach((tile) =>
+    console.log(
+      tile.x,
+      Math.min(...world.map((tile) => Math.abs(x + Pacman.r - tile.x)))
+    )
+  );
+}
+
+function collisionDirection(pacman, world) {
   /*
     dva pravougaonika se preklapaju onda i samo onda ako se sve njihove senke preklapaju
     ovo je SAT teorema primenjena na kvadrate
   */
   if (
-    wall.some(
+    world.some(
       (brick) =>
-        pacman.y - pacman.r <= brick.y + Brick.height &&
+        pacman.y - pacman.r <= brick.y + Tile.height &&
         pacman.x + pacman.r >= brick.x &&
         pacman.y + pacman.r >= brick.y &&
-        pacman.x - pacman.r <= brick.x + Brick.width
+        pacman.x - pacman.r <= brick.x + Tile.width
     )
   ) {
     if (pacman.vx) return 'horizontal';
