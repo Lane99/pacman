@@ -23,6 +23,8 @@ class Brick {
 class Pacman {
   static v = 5;
 
+  vx = 0;
+  vy = 0;
   constructor(x, y) {
     this.x = x;
     this.y = y;
@@ -37,28 +39,16 @@ class Pacman {
     ctx.closePath();
   }
 
-  move() {
-    if (lastKey == 'd') {
-      this.x += Pacman.v;
-      if (isColliding(pacman, wall)) {
-        this.x -= Pacman.v;
-      }
-    } else if (lastKey == 'a') {
-      this.x -= Pacman.v;
-      if (isColliding(pacman, wall)) {
-        this.x += Pacman.v;
-      }
-    } else if (lastKey == 'w') {
-      this.y -= Pacman.v;
-      if (isColliding(pacman, wall)) {
-        this.y += Pacman.v;
-      }
-    } else if (lastKey == 's') {
-      this.y += Pacman.v;
-      if (isColliding(pacman, wall)) {
-        this.y -= Pacman.v;
-      }
-    }
+  updateSpeed() {
+    if (lastKey == 'w') this.vy = -Pacman.v;
+    else if (lastKey == 'a') this.vx = -Pacman.v;
+    else if (lastKey == 's') this.vy = Pacman.v;
+    else if (lastKey == 'd') this.vx = Pacman.v;
+  }
+
+  updatePosition() {
+    this.x += this.vx;
+    this.y += this.vy;
   }
 }
 
@@ -87,22 +77,46 @@ function animate() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   wall.forEach((brick) => brick.draw());
   pacman.draw();
-  pacman.move();
+  pacman.updateSpeed();
+  pacman.updatePosition();
+  if (collisionDirection(pacman, wall) == 'horizontal') {
+    if (lastKey == 'a' || lastKey == 'd') {
+      lastKey = '';
+      pacman.x -= pacman.vx;
+      pacman.vx = 0;
+    }
+  } else if (collisionDirection(pacman, wall) == 'vertical') {
+    if (lastKey == 'w' || lastKey == 's') {
+      lastKey = '';
+      pacman.y -= pacman.vy;
+      pacman.vy = 0;
+    }
+  } else {
+    if 
+  }
+
   requestAnimationFrame(animate);
+  //setInterval(animate, 1000);
 }
 
 animate();
 
-function isColliding(pacman, wall) {
+function collisionDirection(pacman, wall) {
   /*
     dva pravougaonika se preklapaju onda i samo onda ako se sve njihove senke preklapaju
     ovo je SAT teorema primenjena na kvadrate
   */
-  return wall.some(
-    (brick) =>
-      pacman.y - pacman.r <= brick.y + Brick.height &&
-      pacman.x + pacman.r >= brick.x &&
-      pacman.y + pacman.r >= brick.y &&
-      pacman.x - pacman.r <= brick.x + Brick.width
-  );
+  if (
+    wall.some(
+      (brick) =>
+        pacman.y - pacman.r <= brick.y + Brick.height &&
+        pacman.x + pacman.r >= brick.x &&
+        pacman.y + pacman.r >= brick.y &&
+        pacman.x - pacman.r <= brick.x + Brick.width
+    )
+  ) {
+    if (pacman.vx) return 'horizontal';
+    else if (pacman.vy) return 'vertical';
+  }
+  return 'none';
 }
