@@ -78,11 +78,23 @@ function animate() {
 animate();
 
 function nextTileType(x, y, direction) {
+  // let ind = world.findIndex(
+  //   (tile) =>
+  //     tile.y == pacman.y &&
+  //     tile.x + Tile.width / 2 - pacman.x - Pacman.r ==
+  //       Math.min(
+  //         ...world.map((tile) =>
+  //           Math.abs(x + Pacman.r - tile.x - Tile.width / 2)
+  //         )
+  //       )
+  // );
+  // console.log(ind);
+  // return ind;
+  console.log(
+    ...world.map((tile) => Math.abs(x + Pacman.r - tile.x - Tile.width / 2))
+  );
   world.forEach((tile) =>
-    console.log(
-      tile.x,
-      Math.min(...world.map((tile) => Math.abs(x + Pacman.r - tile.x)))
-    )
+    console.log(tile.x + Tile.width / 2 - pacman.x - Pacman.r)
   );
 }
 
