@@ -67,53 +67,41 @@ function animate() {
   //ctx.clearRect(0, 0, canvas.width, canvas.height);
   world.forEach((tile) => tile.draw());
   pacman.draw();
-  if (nextTileType(pacman.x, pacman.y, lastKey) == 'empty') {
-    console.log('prazno');
-  } else console.log('puno');
-
-  //requestAnimationFrame(animate);
-  //setInterval(animate, 1000);
+  if (lastKey == 'd' && possibleMoves(pacman).d) pacman.x += Pacman.v;
+  requestAnimationFrame(animate);
 }
 
 animate();
 
-function nextTileType(x, y, direction) {
-  // let ind = world.findIndex(
-  //   (tile) =>
-  //     tile.y == pacman.y &&
-  //     tile.x + Tile.width / 2 - pacman.x - Pacman.r ==
-  //       Math.min(
-  //         ...world.map((tile) =>
-  //           Math.abs(x + Pacman.r - tile.x - Tile.width / 2)
-  //         )
-  //       )
-  // );
-  // console.log(ind);
-  // return ind;
-  console.log(
-    ...world.map((tile) => Math.abs(x + Pacman.r - tile.x - Tile.width / 2))
-  );
-  world.forEach((tile) =>
-    console.log(tile.x + Tile.width / 2 - pacman.x - Pacman.r)
-  );
+function possibleMoves(pacman) {
+  let moves = {
+    w: true,
+    a: true,
+    s: true,
+    d: true,
+  };
+  let collidingTilesInd = [];
+  world.forEach((tile, index) => {
+    if (isColliding(pacman, tile)) collidingTilesInd.push(index);
+  });
+  if (
+    collidingTilesInd
+      .map((ind) => world[ind + 1])
+      .some((el) => el.type == 'brick')
+  )
+    moves.d = false;
+  return moves;
 }
 
-function collisionDirection(pacman, world) {
+function isColliding(pacman, tile) {
   /*
     dva pravougaonika se preklapaju onda i samo onda ako se sve njihove senke preklapaju
     ovo je SAT teorema primenjena na kvadrate
   */
-  if (
-    world.some(
-      (brick) =>
-        pacman.y - pacman.r <= brick.y + Tile.height &&
-        pacman.x + pacman.r >= brick.x &&
-        pacman.y + pacman.r >= brick.y &&
-        pacman.x - pacman.r <= brick.x + Tile.width
-    )
-  ) {
-    if (pacman.vx) return 'horizontal';
-    else if (pacman.vy) return 'vertical';
-  }
-  return 'none';
+  return (
+    pacman.y - pacman.r <= tile.y + Tile.height &&
+    pacman.x + pacman.r >= tile.x &&
+    pacman.y + pacman.r >= tile.y &&
+    pacman.x - pacman.r <= tile.x + Tile.width
+  );
 }
