@@ -24,16 +24,16 @@ class Tile {
 
 class Pacman {
   static v = 5;
+  static r = 19;
 
   constructor(x, y) {
     this.x = x;
     this.y = y;
-    this.r = 15;
   }
 
   draw() {
     ctx.beginPath();
-    ctx.arc(this.x, this.y, this.r, 0, 2 * Math.PI);
+    ctx.arc(this.x, this.y, Pacman.r, 0, 2 * Math.PI);
     ctx.fillStyle = 'yellow';
     ctx.fill();
     ctx.closePath();
@@ -66,29 +66,66 @@ function animate() {
   //ctx.clearRect(0, 0, canvas.width, canvas.height);
   world.forEach((tile) => tile.draw());
   pacman.draw();
-  if (lastKey == 'd' && possibleMoves(pacman).d) pacman.x += Pacman.v;
-  if (!possibleMoves(pacman).d) pacman.x -= Pacman.v;
+  //console.log(possibleMoves(pacman, world));
+  if (lastKey == 'd' && possibleMoves(pacman, world).d) pacman.x += Pacman.v;
+  else if (lastKey == 'a' && possibleMoves(pacman, world).a)
+    pacman.x -= Pacman.v;
+  else if (lastKey == 's' && possibleMoves(pacman, world).s)
+    pacman.y += Pacman.v;
+  else if (lastKey == 'w' && possibleMoves(pacman, world).w)
+    pacman.y -= Pacman.v;
+
   requestAnimationFrame(animate);
 }
 
 animate();
 
-function possibleMoves(pacman) {
+function possibleMoves(pacman, world) {
   let moves = {
     w: true,
     a: true,
     s: true,
     d: true,
   };
-  let collidingTilesInd = [];
-  world.forEach((tile, index) => {
-    if (isColliding(pacman, tile)) collidingTilesInd.push(index);
-  });
-  if (
-    collidingTilesInd.map((ind) => world[ind]).some((el) => el.type == 'brick')
-  )
+
+  pacman.x += Pacman.v;
+  if (getCollidingBricks(pacman, world)) {
     moves.d = false;
+  }
+  pacman.x -= Pacman.v;
+
+  pacman.x -= Pacman.v;
+  if (getCollidingBricks(pacman, world)) {
+    moves.a = false;
+  }
+  pacman.x += Pacman.v;
+
+  pacman.y += Pacman.v;
+  if (getCollidingBricks(pacman, world)) {
+    moves.s = false;
+  }
+  pacman.y -= Pacman.v;
+
+  pacman.y -= Pacman.v;
+  if (getCollidingBricks(pacman, world)) {
+    moves.w = false;
+  }
+  pacman.y += Pacman.v;
+
+  // world.forEach((tile, index) => {
+  //   if (isColliding(pacman, tile)) collidingTilesInd.push(index);
+  // });
+  // if (
+  //   collidingTilesInd.map((ind) => world[ind]).some((el) => el.type == 'brick')
+  // )
+  //   moves.d = false;
   return moves;
+}
+
+function getCollidingBricks(pacman, world) {
+  return world.find(
+    (tile) => tile.type == 'brick' && isColliding(pacman, tile)
+  );
 }
 
 function isColliding(pacman, tile) {
@@ -97,9 +134,9 @@ function isColliding(pacman, tile) {
     ovo je SAT teorema primenjena na kvadrate
   */
   return (
-    pacman.y - pacman.r <= tile.y + Tile.height &&
-    pacman.x + pacman.r >= tile.x &&
-    pacman.y + pacman.r >= tile.y &&
-    pacman.x - pacman.r <= tile.x + Tile.width
+    pacman.y - Pacman.r <= tile.y + Tile.height &&
+    pacman.x + Pacman.r >= tile.x &&
+    pacman.y + Pacman.r >= tile.y &&
+    pacman.x - Pacman.r <= tile.x + Tile.width
   );
 }
