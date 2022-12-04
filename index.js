@@ -24,7 +24,6 @@ class Tile {
 
 class Pacman {
   static v = 5;
-  static r = 15;
 
   constructor(x, y) {
     this.x = x;
@@ -68,6 +67,7 @@ function animate() {
   world.forEach((tile) => tile.draw());
   pacman.draw();
   if (lastKey == 'd' && possibleMoves(pacman).d) pacman.x += Pacman.v;
+  if (!possibleMoves(pacman).d) pacman.x -= Pacman.v;
   requestAnimationFrame(animate);
 }
 
@@ -85,9 +85,7 @@ function possibleMoves(pacman) {
     if (isColliding(pacman, tile)) collidingTilesInd.push(index);
   });
   if (
-    collidingTilesInd
-      .map((ind) => world[ind + 1])
-      .some((el) => el.type == 'brick')
+    collidingTilesInd.map((ind) => world[ind]).some((el) => el.type == 'brick')
   )
     moves.d = false;
   return moves;
