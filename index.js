@@ -29,6 +29,8 @@ class Pacman {
   constructor(x, y) {
     this.x = x;
     this.y = y;
+    this.vx = 0;
+    this.vy = 0;
   }
 
   draw() {
@@ -38,19 +40,27 @@ class Pacman {
     ctx.fill();
     ctx.closePath();
   }
+
+  move() {
+    this.x += this.vx;
+    this.y += this.vy;
+  }
 }
 
 let pacman = new Pacman(1.5 * Tile.width, 1.5 * Tile.height);
 
 let map = [
-  [1, 1, 1, 1, 1, 1, 1, 1],
-  [1, 0, 0, 0, 0, 0, 0, 1],
-  [1, 0, 1, 1, 1, 1, 0, 1],
-  [1, 0, 0, 0, 0, 0, 0, 1],
-  [1, 0, 1, 1, 1, 1, 0, 1],
-  [1, 0, 0, 0, 0, 1, 0, 1],
-  [1, 0, 0, 0, 0, 0, 0, 1],
-  [1, 1, 1, 1, 1, 1, 1, 1],
+  [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+  [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+  [1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1],
+  [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+  [1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1],
+  [1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1],
+  [1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+  [1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+  [1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+  [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+  [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
 ];
 
 let world = [];
@@ -63,17 +73,22 @@ map.forEach((row, i) => {
 });
 
 function animate() {
-  //ctx.clearRect(0, 0, canvas.width, canvas.height);
   world.forEach((tile) => tile.draw());
   pacman.draw();
-  //console.log(possibleMoves(pacman, world));
-  if (lastKey == 'd' && possibleMoves(pacman, world).d) pacman.x += Pacman.v;
-  else if (lastKey == 'a' && possibleMoves(pacman, world).a)
-    pacman.x -= Pacman.v;
-  else if (lastKey == 's' && possibleMoves(pacman, world).s)
-    pacman.y += Pacman.v;
-  else if (lastKey == 'w' && possibleMoves(pacman, world).w)
-    pacman.y -= Pacman.v;
+  if (lastKey == 'd' && possibleMoves(pacman, world).d) {
+    pacman.vx = Pacman.v;
+    pacman.vy = 0;
+  } else if (lastKey == 'a' && possibleMoves(pacman, world).a) {
+    pacman.vx = -Pacman.v;
+    pacman.vy = 0;
+  } else if (lastKey == 's' && possibleMoves(pacman, world).s) {
+    pacman.vy = Pacman.v;
+    pacman.vx = 0;
+  } else if (lastKey == 'w' && possibleMoves(pacman, world).w) {
+    pacman.vy = -Pacman.v;
+    pacman.vx = 0;
+  }
+  pacman.move();
 
   requestAnimationFrame(animate);
 }
@@ -89,36 +104,21 @@ function possibleMoves(pacman, world) {
   };
 
   pacman.x += Pacman.v;
-  if (getCollidingBricks(pacman, world)) {
-    moves.d = false;
-  }
+  if (getCollidingBricks(pacman, world)) moves.d = false;
   pacman.x -= Pacman.v;
 
   pacman.x -= Pacman.v;
-  if (getCollidingBricks(pacman, world)) {
-    moves.a = false;
-  }
+  if (getCollidingBricks(pacman, world)) moves.a = false;
   pacman.x += Pacman.v;
 
   pacman.y += Pacman.v;
-  if (getCollidingBricks(pacman, world)) {
-    moves.s = false;
-  }
+  if (getCollidingBricks(pacman, world)) moves.s = false;
   pacman.y -= Pacman.v;
 
   pacman.y -= Pacman.v;
-  if (getCollidingBricks(pacman, world)) {
-    moves.w = false;
-  }
+  if (getCollidingBricks(pacman, world)) moves.w = false;
   pacman.y += Pacman.v;
 
-  // world.forEach((tile, index) => {
-  //   if (isColliding(pacman, tile)) collidingTilesInd.push(index);
-  // });
-  // if (
-  //   collidingTilesInd.map((ind) => world[ind]).some((el) => el.type == 'brick')
-  // )
-  //   moves.d = false;
   return moves;
 }
 
