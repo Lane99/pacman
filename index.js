@@ -105,7 +105,6 @@ function animate() {
     }
   }
   pacman.move();
-
   requestAnimationFrame(animate);
 }
 
@@ -140,7 +139,7 @@ function possibleMoves(pacman, world) {
 
 function getCollidingBricks(pacman, world) {
   return world.find(
-    (tile) => tile.type == 'brick' && isColliding(pacman, tile)
+    (tile) => tile.type == 'brick' && isColliding(pacman, tile) //izgleda da moze da se izbaci type iz klase
   );
 }
 
