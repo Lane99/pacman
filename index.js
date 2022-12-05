@@ -75,18 +75,34 @@ map.forEach((row, i) => {
 function animate() {
   world.forEach((tile) => tile.draw());
   pacman.draw();
-  if (lastKey == 'd' && possibleMoves(pacman, world).d) {
-    pacman.vx = Pacman.v;
-    pacman.vy = 0;
-  } else if (lastKey == 'a' && possibleMoves(pacman, world).a) {
-    pacman.vx = -Pacman.v;
-    pacman.vy = 0;
-  } else if (lastKey == 's' && possibleMoves(pacman, world).s) {
-    pacman.vy = Pacman.v;
-    pacman.vx = 0;
-  } else if (lastKey == 'w' && possibleMoves(pacman, world).w) {
-    pacman.vy = -Pacman.v;
-    pacman.vx = 0;
+  if (lastKey == 'd') {
+    if (possibleMoves(pacman, world).d) {
+      pacman.vx = Pacman.v;
+      pacman.vy = 0;
+    } else {
+      pacman.vx = 0;
+    }
+  } else if (lastKey == 'a') {
+    if (possibleMoves(pacman, world).a) {
+      pacman.vx = -Pacman.v;
+      pacman.vy = 0;
+    } else {
+      pacman.vx = 0;
+    }
+  } else if (lastKey == 's') {
+    if (possibleMoves(pacman, world).s) {
+      pacman.vy = Pacman.v;
+      pacman.vx = 0;
+    } else {
+      pacman.vy = 0;
+    }
+  } else if (lastKey == 'w') {
+    if (possibleMoves(pacman, world).w) {
+      pacman.vy = -Pacman.v;
+      pacman.vx = 0;
+    } else {
+      pacman.vy = 0;
+    }
   }
   pacman.move();
 
